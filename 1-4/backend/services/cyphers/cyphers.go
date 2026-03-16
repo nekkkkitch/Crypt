@@ -218,9 +218,9 @@ func (c *Caesar) Cypher(input string) string {
 		upped := strings.ToUpper(string(runed[i]))
 		runed[i] = []rune(upped)[0]
 		if strings.Contains(string(alph), upped) {
-			cyphered[i] = alph[(slices.Index(alph, runed[i])+c.step)%len(alph)]
+			cyphered[i] = alph[abs(slices.Index(alph, runed[i])+c.step)%len(alph)]
 		} else if strings.Contains(string(rusAlph), upped) {
-			cyphered[i] = rusAlph[(slices.Index(rusAlph, runed[i])+c.step)%len(rusAlph)]
+			cyphered[i] = rusAlph[abs(slices.Index(rusAlph, runed[i])+c.step)%len(rusAlph)]
 		} else {
 			cyphered[i] = runed[i]
 		}
@@ -236,9 +236,9 @@ func (c *Caesar) Decypher(input string) string {
 		upped := strings.ToUpper(string(runed[i]))
 		runed[i] = []rune(upped)[0]
 		if strings.Contains(string(alph), upped) {
-			cyphered[i] = alph[abs(slices.Index(alph, runed[i])-c.step)]
+			cyphered[i] = alph[abs(slices.Index(alph, runed[i])-c.step)%len(alph)]
 		} else if strings.Contains(string(rusAlph), upped) {
-			cyphered[i] = rusAlph[abs(slices.Index(rusAlph, runed[i])-c.step)]
+			cyphered[i] = rusAlph[abs(slices.Index(rusAlph, runed[i])-c.step)%len(rusAlph)]
 		} else {
 			cyphered[i] = runed[i]
 		}

@@ -60,13 +60,19 @@ window.changeCypher = function () {
             case "scytale":
                 document.getElementById("param-label").innerHTML = "Height";
                 paramsField.style.display = "inline ";
+                paramsField.value = 4;
+                changeParams(4);
                 break;
             case "polybius":
                 document.getElementById("param-label").innerHTML = "Language (0 - English, 1 - Russian)";
                 paramsField.style.display = "inline";
+                paramsField.value = 0;
+                changeParams(0);
                 break;
             case "caesar":
                 document.getElementById("param-label").innerHTML = "Step";
+                paramsField.value = 3;
+                changeParams(3);
                 paramsField.style.display = "inline";
                 break;
         }
