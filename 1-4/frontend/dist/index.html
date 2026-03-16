@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>1-4</title>
+  <script type="module" crossorigin src="/assets/index.ffaf0958.js"></script>
+  <link rel="stylesheet" href="/assets/index.5a710b5e.css">
+</head>
+<body>
+    <label for="cypher-select">Choose a cypher:</label>
+    <select name="Cyphers" id="cypher-select" onchange="changeCypher()">
+        <option value="atbash">Atbash</option>
+        <option value="scytale">Scytale</option>
+        <option value="polybius">Polybius</option>
+        <option value="caesar">Caesar</option>
+    </select>
+
+    <br></br>
+    <input id="cypher-input" type="text" placeholder="Text to cypher"/>
+    <button onclick="cypher()">Cypher</button>
+    <br></br>
+    <input id="decypher-input" type="text" placeholder="Text to decypher"/>
+    <button onclick="decypher()">Decypher</button>
+    <br></br>
+    <input id="result" type="text" placeholder="Result" readonly="readonly"/>
+    <br></br>
+
+    <label id="param-label" for="param1">no param :(</label>
+    <input id="param1" type="text" placeholder="Param" onchange="changeParams(this.value)" style="display: none;"/>
+<div id="app"></div>
+
+</body>
+</html>
