@@ -3,7 +3,7 @@
 
 export function ChangeCypher(arg1:string):Promise<void>;
 
-export function ChangeParams(arg1:number):Promise<void>;
+export function ChangeParams(arg1:Array<any>):Promise<void>;
 
 export function Cypher(arg1:string):Promise<string>;
 

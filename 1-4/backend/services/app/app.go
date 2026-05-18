@@ -2,13 +2,14 @@ package app
 
 import (
 	"context"
+	"log/slog"
 )
 
-// пусть app при инициализации принимает на вход 4 объекта подходящих под данный интерфейс, раскидывая их в мапу, пусть будет map[string]Cypher
+// pусть app при инициализации принимает на вход 4 объекта подходящих под данный интерфейс, раскидывая их в мапу, пусть будет map[string]Cypher
 type Cypher interface {
 	Cypher(input string) string
 	Decypher(input string) string
-	ChangeParams(params int)
+	ChangeParams(params []interface{})
 }
 
 // App struct
@@ -19,13 +20,15 @@ type App struct {
 }
 
 // NewApp creates a new App application struct
-func NewApp(a, s, p, c Cypher) *App {
+func NewApp(a, s, p, c, g, v Cypher) *App {
 	app := &App{}
 	app.cyphers = map[string]Cypher{
-		"atbash":   a,
-		"scytale":  s,
-		"polybius": p,
-		"caesar":   c,
+		"atbash":    a,
+		"scytale":   s,
+		"polybius":  p,
+		"caesar":    c,
+		"gronsfeld": g,
+		"vigener":   v,
 	}
 	app.currentCypher = a
 	return app
@@ -45,11 +48,12 @@ func (a *App) Decypher(input string) string {
 	return a.currentCypher.Decypher(input)
 }
 
-func (a *App) ChangeParams(params int) {
+func (a *App) ChangeParams(params []interface{}) {
 	a.currentCypher.ChangeParams(params)
 }
 
 func (a *App) ChangeCypher(choice string) {
+	slog.Info("Got cypher to change", "cyhper", choice)
 	if cypher, ok := a.cyphers[choice]; ok {
 		a.currentCypher = cypher
 	}

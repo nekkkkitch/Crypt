@@ -2,6 +2,7 @@ package cyphers
 
 import (
 	"fmt"
+	"log/slog"
 	"math"
 	"slices"
 	"strconv"
@@ -46,6 +47,14 @@ type Caesar struct {
 	step int
 }
 
+type Gronsfeld struct {
+	key []int
+}
+
+type Vigener struct {
+	key []int
+}
+
 func (a *Atbash) Cypher(input string) string {
 	runed := []rune(input)
 	cyphered := make([]rune, len(runed))
@@ -65,7 +74,7 @@ func (a *Atbash) Decypher(input string) string {
 	return a.Cypher(input)
 }
 
-func (a *Atbash) ChangeParams(params int) {}
+func (a *Atbash) ChangeParams(params []interface{}) {}
 
 func (s *Scytale) Cypher(input string) string {
 	runed := []rune(input)
@@ -122,8 +131,9 @@ func (s *Scytale) Decypher(input string) string {
 	return res
 }
 
-func (s *Scytale) ChangeParams(params int) {
-	s.height = params
+func (s *Scytale) ChangeParams(params []interface{}) {
+	slog.Info("Got params for scytale:", "params", params)
+	s.height = int(params[0].(float64))
 }
 
 func (p *Polybius) Cypher(input string) string {
@@ -207,8 +217,9 @@ func (p *Polybius) Decypher(input string) string {
 	return string(newRuned)
 }
 
-func (p *Polybius) ChangeParams(params int) {
-	p.chosenLang = params
+func (p *Polybius) ChangeParams(params []interface{}) {
+	slog.Info("Got params for polybius:", "params", params)
+	p.chosenLang = int(params[0].(float64))
 }
 
 func (c *Caesar) Cypher(input string) string {
@@ -246,8 +257,9 @@ func (c *Caesar) Decypher(input string) string {
 	return string(cyphered)
 }
 
-func (c *Caesar) ChangeParams(params int) {
-	c.step = params
+func (c *Caesar) ChangeParams(params []interface{}) {
+	slog.Info("Got params for caesar:", "params", params)
+	c.step = int(params[0].(float64))
 }
 
 func abs(input int) int {
@@ -255,4 +267,99 @@ func abs(input int) int {
 		input += 26
 	}
 	return input
+}
+
+func (g *Gronsfeld) Cypher(input string) string {
+	runed := []rune(input)
+	cyphered := make([]rune, len(runed))
+	for i := range runed {
+		upped := strings.ToUpper(string(runed[i]))
+		runed[i] = []rune(upped)[0]
+		if strings.Contains(string(alph), upped) {
+			cyphered[i] = alph[abs(slices.Index(alph, runed[i])+g.key[i%len(g.key)])%len(alph)]
+		} else if strings.Contains(string(rusAlph), upped) {
+			cyphered[i] = rusAlph[abs(slices.Index(rusAlph, runed[i])+g.key[i%len(g.key)])%len(rusAlph)]
+		} else {
+			cyphered[i] = runed[i]
+		}
+	}
+	fmt.Println(cyphered)
+	return string(cyphered)
+}
+
+func (g *Gronsfeld) Decypher(input string) string {
+	runed := []rune(input)
+	cyphered := make([]rune, len(runed))
+	for i := range runed {
+		upped := strings.ToUpper(string(runed[i]))
+		runed[i] = []rune(upped)[0]
+		if strings.Contains(string(alph), upped) {
+			cyphered[i] = alph[abs(slices.Index(alph, runed[i])-g.key[i%len(g.key)])%len(alph)]
+		} else if strings.Contains(string(rusAlph), upped) {
+			cyphered[i] = rusAlph[abs(slices.Index(rusAlph, runed[i])-g.key[i%len(g.key)])%len(rusAlph)]
+		} else {
+			cyphered[i] = runed[i]
+		}
+	}
+	return string(cyphered)
+}
+
+func (g *Gronsfeld) ChangeParams(params []interface{}) {
+	slog.Info("Got params for gronsfeld:", "params", params)
+	param := []rune(params[0].(string))
+	g.key = make([]int, len(param))
+	for i := range param {
+		g.key[i], _ = strconv.Atoi(string(param[i]))
+	}
+}
+
+func (v *Vigener) Cypher(input string) string {
+	runed := []rune(input)
+	cyphered := make([]rune, len(runed))
+	for i := range runed {
+		upped := strings.ToUpper(string(runed[i]))
+		runed[i] = []rune(upped)[0]
+		if strings.Contains(string(alph), upped) {
+			cyphered[i] = alph[abs(slices.Index(alph, runed[i])+v.key[i%len(v.key)])%len(alph)]
+		} else if strings.Contains(string(rusAlph), upped) {
+			cyphered[i] = rusAlph[abs(slices.Index(rusAlph, runed[i])+v.key[i%len(v.key)])%len(rusAlph)]
+		} else {
+			cyphered[i] = runed[i]
+		}
+	}
+	fmt.Println(cyphered)
+	return string(cyphered)
+
+}
+
+func (v *Vigener) Decypher(input string) string {
+	runed := []rune(input)
+	cyphered := make([]rune, len(runed))
+	for i := range runed {
+		upped := strings.ToUpper(string(runed[i]))
+		runed[i] = []rune(upped)[0]
+		if strings.Contains(string(alph), upped) {
+			cyphered[i] = alph[abs(slices.Index(alph, runed[i])-v.key[i%len(v.key)])%len(alph)]
+		} else if strings.Contains(string(rusAlph), upped) {
+			cyphered[i] = rusAlph[abs(slices.Index(rusAlph, runed[i])-v.key[i%len(v.key)])%len(rusAlph)]
+		} else {
+			cyphered[i] = runed[i]
+		}
+	}
+	return string(cyphered)
+
+}
+
+func (v *Vigener) ChangeParams(params []interface{}) {
+	slog.Info("Got params for vigener:", "params", params)
+	letters := []rune(params[0].(string))
+	v.key = make([]int, len(letters))
+
+	for i := range letters {
+		letterIndex := slices.Index(alph, letters[i])
+		if letterIndex == -1 {
+			letterIndex = slices.Index(rusAlph, letters[i])
+		}
+		v.key[i] = letterIndex
+	}
 }

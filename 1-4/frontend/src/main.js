@@ -1,10 +1,10 @@
 import './style.css';
 import './app.css';
 
-import {ChangeCypher} from '../wailsjs/go/app/App';
-import {ChangeParams} from '../wailsjs/go/app/App';
-import {Cypher} from '../wailsjs/go/app/App';
-import {Decypher} from '../wailsjs/go/app/App';
+import { ChangeCypher } from '../wailsjs/go/app/App';
+import { ChangeParams } from '../wailsjs/go/app/App';
+import { Cypher } from '../wailsjs/go/app/App';
+import { Decypher } from '../wailsjs/go/app/App';
 
 var cypherField = document.getElementById("cypher-input");
 var decypherField = document.getElementById("decypher-input");
@@ -49,9 +49,16 @@ window.decypher = function () {
 
 window.changeCypher = function () {
     let select = document.getElementById("cypher-select").value;
-
-    try {
+    console.log("current selection", select)
+    try{
         ChangeCypher(select);
+        console.log("cypher changed")
+    } catch (err){
+        console.error(err);
+    }
+    setTimeout(function(){
+        try {
+        console.log("sending params")
         switch (select) {
             case "atbash":
                 document.getElementById("param-label").innerHTML = "no param :(";
@@ -59,7 +66,7 @@ window.changeCypher = function () {
                 break;
             case "scytale":
                 document.getElementById("param-label").innerHTML = "Height";
-                paramsField.style.display = "inline ";
+                paramsField.style.display = "inline";
                 paramsField.value = 4;
                 changeParams(4);
                 break;
@@ -71,22 +78,34 @@ window.changeCypher = function () {
                 break;
             case "caesar":
                 document.getElementById("param-label").innerHTML = "Step";
+                paramsField.style.display = "inline";
                 paramsField.value = 3;
                 changeParams(3);
+                break;
+            case "gronsfeld":
+                document.getElementById("param-label").innerHTML = "Key (digits)";
                 paramsField.style.display = "inline";
+                paramsField.value = "123";
+                changeParams("123");
+                break;
+            case "vigener":
+                document.getElementById("param-label").innerHTML = "Key (letters)";
+                paramsField.style.display = "inline";
+                paramsField.value = "KEY";
+                changeParams("KEY");
                 break;
         }
-
     } catch (err) {
         console.error(err);
     }
+    }, 100);
 }
 
 window.changeParams = function (value) {
-    let param1 = Number(value);
-    
-    try { 
-        ChangeParams(Number(value));
+    let param1 = [value];
+
+    try {
+        ChangeParams(param1);
     } catch (err) {
         console.error(err);
     }

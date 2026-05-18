@@ -78,3 +78,41 @@ func TestCaesar(t *testing.T) {
 	require.Equal(t, expectedCyphered, realCyphered)
 	require.Equal(t, inputDecyphered, realDecyphered)
 }
+
+func TestGronsfeld(t *testing.T) {
+	g := Gronsfeld{key: []int{1, 2, 3}}
+
+	t.Log("English")
+	inputDecyphered := "ABC"
+	expectedCyphered := "BDF"
+	realCyphered := g.Cypher(inputDecyphered)
+	realDecyphered := g.Decypher(expectedCyphered)
+	require.Equal(t, expectedCyphered, realCyphered)
+	require.Equal(t, inputDecyphered, realDecyphered)
+	t.Log("Russian")
+	inputDecyphered = "АБВ"
+	expectedCyphered = "БГЕ"
+	realCyphered = g.Cypher(inputDecyphered)
+	realDecyphered = g.Decypher(expectedCyphered)
+	require.Equal(t, expectedCyphered, realCyphered)
+	require.Equal(t, inputDecyphered, realDecyphered)
+}
+
+func TestVigener(t *testing.T) {
+	v := Vigener{key: []int{0, 1, 2}} // KEY
+
+	t.Log("English")
+	inputDecyphered := "ABC"
+	expectedCyphered := "ACE"
+	realCyphered := v.Cypher(inputDecyphered)
+	realDecyphered := v.Decypher(expectedCyphered)
+	require.Equal(t, expectedCyphered, realCyphered)
+	require.Equal(t, inputDecyphered, realDecyphered)
+	t.Log("Russian")
+	inputDecyphered = "АБВ"
+	expectedCyphered = "АВД"
+	realCyphered = v.Cypher(inputDecyphered)
+	realDecyphered = v.Decypher(expectedCyphered)
+	require.Equal(t, expectedCyphered, realCyphered)
+	require.Equal(t, inputDecyphered, realDecyphered)
+}
