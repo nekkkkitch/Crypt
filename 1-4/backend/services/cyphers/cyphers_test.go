@@ -116,3 +116,47 @@ func TestVigener(t *testing.T) {
 	require.Equal(t, expectedCyphered, realCyphered)
 	require.Equal(t, inputDecyphered, realDecyphered)
 }
+
+func TestPlayfair(t *testing.T) {
+	pl := Playfair{}
+
+	t.Log("English")
+	pl.ChangeParams([]interface{}{"secret"})
+	inputDecyphered := "abcdef"
+	expectedCyphered := "bddkrb"
+	realCyphered := pl.Cypher(inputDecyphered)
+	realDecyphered := pl.Decypher(expectedCyphered)
+	require.Equal(t, expectedCyphered, realCyphered)
+	require.Equal(t, inputDecyphered, realDecyphered)
+
+	t.Log("Russian")
+	pl.ChangeParams([]interface{}{"секрет"})
+	inputDecyphered = "абвгде"
+	expectedCyphered = "сжгдвр"
+	realCyphered = pl.Cypher(inputDecyphered)
+	realDecyphered = pl.Decypher(expectedCyphered)
+	require.Equal(t, expectedCyphered, realCyphered)
+	require.Equal(t, inputDecyphered, realDecyphered)
+}
+
+func TestHill(t *testing.T) {
+	h := Hill{}
+
+	t.Log("English")
+	h.ChangeParams([]interface{}{"GYBNQKURP"})
+	input := "ACT"
+	expected := "POH"
+	result := h.Cypher(input)
+	resultDec := h.Decypher(expected)
+	require.Equal(t, expected, result)
+	require.Equal(t, input, resultDec)
+
+	t.Log("Russian")
+	h.ChangeParams([]interface{}{"йцукенгшщ"})
+	input = "ПРМ"
+	expected = "ТНТ"
+	result = h.Cypher(input)
+	resultDec = h.Decypher(expected)
+	require.Equal(t, expected, result)
+	require.Equal(t, input, resultDec)
+}

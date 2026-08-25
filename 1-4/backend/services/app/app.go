@@ -20,7 +20,7 @@ type App struct {
 }
 
 // NewApp creates a new App application struct
-func NewApp(a, s, p, c, g, v Cypher) *App {
+func NewApp(a, s, p, c, g, v, pl Cypher) *App {
 	app := &App{}
 	app.cyphers = map[string]Cypher{
 		"atbash":    a,
@@ -29,6 +29,7 @@ func NewApp(a, s, p, c, g, v Cypher) *App {
 		"caesar":    c,
 		"gronsfeld": g,
 		"vigener":   v,
+		"playfair":  pl,
 	}
 	app.currentCypher = a
 	return app

@@ -94,6 +94,12 @@ window.changeCypher = function () {
                 paramsField.value = "KEY";
                 changeParams("KEY");
                 break;
+            case "playfair":
+                document.getElementById("param-label").innerHTML = "Key (letters)";
+                paramsField.style.display = "inline";
+                paramsField.value = "secret";
+                changeParams("secret");
+                break;
         }
     } catch (err) {
         console.error(err);
