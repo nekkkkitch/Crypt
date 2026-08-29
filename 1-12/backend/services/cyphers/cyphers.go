@@ -71,6 +71,11 @@ type Hill struct {
 	isRus bool
 }
 
+type Vernam struct {
+	key   []int
+	isRus bool
+}
+
 func (a *Atbash) Cypher(input string) string {
 	runed := []rune(input)
 	cyphered := make([]rune, len(runed))
@@ -760,6 +765,72 @@ func (h *Hill) ChangeParams(params []interface{}) {
 			return
 		}
 		h.key = &matrix
+	}
+}
+
+func (v *Vernam) Cypher(input string) string {
+	runed := []rune(input)
+	ok, isRus := checkConsistency(input)
+	if !ok {
+		slog.Error("Vernam: input is not consistent or contains special symbols")
+		return ""
+	}
+
+	if isRus != v.isRus {
+		slog.Error("Vernam: wrong language")
+		return ""
+	}
+
+	if len(runed) != len(v.key) {
+		slog.Error("Vernam: message should be same len as key")
+		return ""
+	}
+
+	vigener := Vigener{key: v.key}
+	return vigener.Cypher(input)
+}
+
+func (v *Vernam) Decypher(input string) string {
+	runed := []rune(input)
+	ok, isRus := checkConsistency(input)
+	if !ok {
+		slog.Error("Vernam: input is not consistent or contains special symbols")
+		return ""
+	}
+
+	if isRus != v.isRus {
+		slog.Error("Vernam: wrong language")
+		return ""
+	}
+
+	if len(runed) != len(v.key) {
+		slog.Error("Vernam: message should be same len as key")
+		return ""
+	}
+
+	vigener := Vigener{key: v.key}
+	return vigener.Decypher(input)
+}
+
+func (v *Vernam) ChangeParams(params []interface{}) {
+	keyWord := []rune(strings.ToUpper(params[0].(string)))
+	ok, isRus := checkConsistency(string(keyWord))
+	if !ok {
+		slog.Error("Vernam: key word is not consistent or contains special symbols")
+		return
+	}
+
+	v.isRus = isRus
+
+	v.key = make([]int, len(keyWord))
+	if !v.isRus {
+		for i := range v.key {
+			v.key[i] = slices.Index(alph, keyWord[i])
+		}
+	} else {
+		for i := range v.key {
+			v.key[i] = slices.Index(rusAlph, keyWord[i])
+		}
 	}
 }
 

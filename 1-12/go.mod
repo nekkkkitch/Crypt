@@ -1,10 +1,11 @@
-module 1-4
+module 1-12
 
 go 1.24.0
 
 require (
 	github.com/stretchr/testify v1.11.1
 	github.com/wailsapp/wails/v2 v2.12.0
+	gonum.org/v1/gonum v0.17.0
 )
 
 require (
@@ -38,7 +39,6 @@ require (
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
-	gonum.org/v1/gonum v0.17.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

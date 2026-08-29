@@ -160,3 +160,25 @@ func TestHill(t *testing.T) {
 	require.Equal(t, expected, result)
 	require.Equal(t, input, resultDec)
 }
+
+func TestVernam(t *testing.T) {
+	v := Vernam{}
+
+	t.Log("English")
+	v.ChangeParams([]interface{}{"ABCDE"})
+	input := "HELLO"
+	expected := "HFNOS"
+	result := v.Cypher(input)
+	resultDec := v.Decypher(expected)
+	require.Equal(t, expected, result)
+	require.Equal(t, input, resultDec)
+
+	t.Log("Russian")
+	v.ChangeParams([]interface{}{"АБВГДЕ"})
+	input = "ПРИВЕТ"
+	expected = "ПСКЕИЧ"
+	result = v.Cypher(input)
+	resultDec = v.Decypher(expected)
+	require.Equal(t, expected, result)
+	require.Equal(t, input, resultDec)
+}

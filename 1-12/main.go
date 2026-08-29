@@ -1,8 +1,8 @@
 package main
 
 import (
-	"1-4/backend/services/app"
-	"1-4/backend/services/cyphers"
+	"1-12/backend/services/app"
+	"1-12/backend/services/cyphers"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
