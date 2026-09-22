@@ -21,9 +21,11 @@ func main() {
 	var g cyphers.Gronsfeld
 	var v cyphers.Vigener
 	var pl cyphers.Playfair
+	var h cyphers.Hill
+	var vm cyphers.Vernam
 
 	// Create an instance of the window structure
-	window := app.NewApp(&a, &s, &p, &c, &g, &v, &pl)
+	window := app.NewApp(&a, &s, &p, &c, &g, &v, &pl, &h, &vm)
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "1-4",

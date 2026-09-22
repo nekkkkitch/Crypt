@@ -100,6 +100,19 @@ window.changeCypher = function () {
                 paramsField.value = "secret";
                 changeParams("secret");
                 break;
+            case "hill":
+                document.getElementById("param-label").innerHTML = "Key (letters)";
+                paramsField.style.display = "inline";
+                paramsField.value = "secret";
+                changeParams("secret");
+                break;
+            case "vernam":
+                document.getElementById("param-label").innerHTML = "Key (letters)";
+                paramsField.style.display = "inline";
+                paramsField.value = "secret";
+                changeParams("secret");
+                break;
+
         }
     } catch (err) {
         console.error(err);

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"math"
 	"math/big"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -244,6 +245,7 @@ func (p *Polybius) ChangeParams(params []interface{}) {
 }
 
 func (c *Caesar) Cypher(input string) string {
+	input = Beautify(input)
 	runed := []rune(input)
 	cyphered := make([]rune, len(runed))
 	for i := range runed {
@@ -257,11 +259,11 @@ func (c *Caesar) Cypher(input string) string {
 			cyphered[i] = runed[i]
 		}
 	}
-	fmt.Println(cyphered)
 	return string(cyphered)
 }
 
 func (c *Caesar) Decypher(input string) string {
+	input = Beautify(input)
 	runed := []rune(input)
 	cyphered := make([]rune, len(runed))
 	for i := range runed {
@@ -584,6 +586,10 @@ func (pl *Playfair) CheckWord(word []rune) bool {
 }
 
 func (h *Hill) Cypher(input string) string {
+	if h.key == nil {
+		slog.Error("Key is not ready")
+		return ""
+	}
 	cons, isRus := checkConsistency(input)
 	if !cons || isRus != h.isRus {
 		slog.Error("word not consistent or its language is not the same as key")
@@ -634,6 +640,10 @@ func (h *Hill) Cypher(input string) string {
 }
 
 func (h *Hill) Decypher(input string) string {
+	if h.key == nil {
+		slog.Error("Key is not ready")
+		return ""
+	}
 	cons, isRus := checkConsistency(input)
 	if !cons || isRus != h.isRus {
 		slog.Error("word not consistent or its language is not the same as key")
@@ -710,7 +720,12 @@ func (h *Hill) Decypher(input string) string {
 	return string(resultWord)
 }
 func (h *Hill) ChangeParams(params []interface{}) {
+	h.key = nil
 	keyWord := []rune(strings.ToUpper(params[0].(string)))
+	if len(keyWord) == 0 {
+		slog.Error("Len of key is 0")
+		return
+	}
 	if math.Sqrt(float64(len(keyWord))) != float64(int(math.Sqrt(float64(len(keyWord))))) {
 		slog.Error("Len of key is not square of int", "len", len(keyWord))
 		return
@@ -854,4 +869,11 @@ func divMod(num, step int) int {
 		num += step
 	}
 	return num
+}
+
+var ForTS = regexp.MustCompile(`[^\p{Latin}\p{Cyrillic}]`)
+
+func Beautify(text string) string {
+	text = strings.ToUpper(text)
+	return ForTS.ReplaceAllString(text, "")
 }
