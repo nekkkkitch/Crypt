@@ -1,11 +1,14 @@
 package app
 
 import (
+	crypanalysis "13/backend/services/cryptanalysis"
 	"context"
+	"encoding/json"
+	"log/slog"
 )
 
-// pусть app при инициализации принимает на вход 4 объекта подходящих под данный интерфейс, раскидывая их в мапу, пусть будет map[string]Cypher
 type CryptAnalysator interface {
+	Analyse() crypanalysis.Data
 }
 
 // App struct
@@ -25,4 +28,13 @@ func NewApp(a CryptAnalysator) *App {
 // so we can call the runtime methods
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+}
+
+func (a *App) Analyse() []byte {
+	data := a.a.Analyse()
+	toRet, err := json.Marshal(data)
+	if err != nil {
+		slog.Error("json err", "err", err)
+	}
+	return toRet
 }

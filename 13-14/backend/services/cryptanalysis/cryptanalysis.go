@@ -8,11 +8,18 @@ import (
 )
 
 type Analysator struct {
-	Freq    Frequency
-	Index   Index
-	AC      AutoCorrelation
-	Kasiski Kasiski
-	IsRus   bool
+	Freq        Frequency
+	Index       Index
+	AC          AutoCorrelation
+	Kasiski     Kasiski
+	IsRus       bool
+	currentText string
+}
+
+type Data struct {
+	F FreqData    `json:"freq_data"`
+	A ACData      `json:"ac_data"`
+	K KasiskiData `json:"k_data"`
 }
 
 type Frequency struct {
@@ -61,6 +68,23 @@ type KasiskiData struct {
 
 var engFreq = []rune("ETAOINSHRDLCUMWFGYPBVKJXQZ")
 var rusFreq = []rune("ОЕАИНТСЛВРКМДПЫУБЯЬГЗЧЙЖХШЮЦЭЩФЁЪ")
+
+func (a *Analysator) Analyse() Data {
+	var d Data
+	d.A = a.AC.Analyse(a.currentText)
+	d.F = a.Freq.Analyse(a.currentText, a.IsRus)
+	d.K = a.Kasiski.Analyse(a.currentText)
+	return d
+}
+
+func (a *Analysator) SetText(text string, isRus bool) {
+	a.currentText = text
+	a.IsRus = isRus
+}
+
+func (a *Analysator) SetFile(file any) {
+
+}
 
 // TODO доделать приём файлов, хз пока в каком виде их бэк получает
 func (f *Frequency) Analyse(text string, isRus bool) FreqData {

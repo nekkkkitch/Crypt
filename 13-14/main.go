@@ -2,6 +2,7 @@ package main
 
 import (
 	"13/backend/services/app"
+	crypanalysis "13/backend/services/cryptanalysis"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
@@ -13,7 +14,7 @@ import (
 var assets embed.FS
 
 func main() {
-	var a app.CryptAnalysator
+	var a crypanalysis.Analysator
 	// Create an instance of the app structure
 	app := app.NewApp(a)
 
