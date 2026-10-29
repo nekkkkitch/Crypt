@@ -1,7 +1,10 @@
-package crypanalysis
+package cryptanalysis
 
 import (
+	"fmt"
 	"log/slog"
+	"maps"
+	"os"
 	"regexp"
 	"slices"
 	"strings"
@@ -17,9 +20,10 @@ type Analysator struct {
 }
 
 type Data struct {
-	F FreqData    `json:"freq_data"`
-	A ACData      `json:"ac_data"`
-	K KasiskiData `json:"k_data"`
+	F     FreqData    `json:"freq_data"`
+	A     ACData      `json:"ac_data"`
+	K     KasiskiData `json:"k_data"`
+	Index float64     `json:"index_data"`
 }
 
 type Frequency struct {
@@ -27,14 +31,14 @@ type Frequency struct {
 }
 
 type FreqData struct {
-	Frequencies map[string]Place
-	Sorted      []SymbolFreq
-	InStupid    string
+	Frequencies map[string]Place `json:"frequencies"`
+	Sorted      []SymbolFreq     `json:"sorted"`
+	InStupid    string           `json:"in_stupid"`
 }
 
 type Place struct {
-	part   float64
-	number int
+	Part   float64 `json:"part"`
+	Number int     `json:"number"`
 }
 
 type SymbolFreq struct {
@@ -50,20 +54,20 @@ type AutoCorrelation struct {
 }
 
 type ACData struct {
-	Correlations []Correlation
+	Correlations []Correlation `json:"correlations"`
 }
 
 type Correlation struct {
-	Amount      int
-	Coefficient float64
-	T           int
+	Amount      int     `json:"amount"`
+	Coefficient float64 `json:"coefficient"`
+	T           int     `json:"t"`
 }
 
 type Kasiski struct {
 }
 
 type KasiskiData struct {
-	PossibleDividers map[int]struct{}
+	PossibleDividers map[int]struct{} `json:"possible_dividers"`
 }
 
 var engFreq = []rune("ETAOINSHRDLCUMWFGYPBVKJXQZ")
@@ -74,19 +78,27 @@ func (a *Analysator) Analyse() Data {
 	d.A = a.AC.Analyse(a.currentText)
 	d.F = a.Freq.Analyse(a.currentText, a.IsRus)
 	d.K = a.Kasiski.Analyse(a.currentText)
+	d.Index = Analyse(d.F)
 	return d
 }
 
 func (a *Analysator) SetText(text string, isRus bool) {
 	a.currentText = text
 	a.IsRus = isRus
+	slog.Info("Got text from file", "text part", text)
 }
 
-func (a *Analysator) SetFile(file any) {
-
+func (a *Analysator) SetFile(filePath string, isRus bool) {
+	file, err := os.ReadFile(filePath)
+	if err != nil {
+		return
+	}
+	text := string(file)
+	a.IsRus = isRus
+	a.currentText = text
+	slog.Info("Got text from file", "text part", string([]rune(text)[:50]))
 }
 
-// TODO доделать приём файлов, хз пока в каком виде их бэк получает
 func (f *Frequency) Analyse(text string, isRus bool) FreqData {
 	f.currentData = FreqData{}
 	var data FreqData
@@ -105,7 +117,7 @@ func (f *Frequency) Analyse(text string, isRus bool) FreqData {
 			continue
 		}
 		place := data.Frequencies[string(runedText[i])]
-		place.part += 1
+		place.Part += 1
 		data.Frequencies[string(runedText[i])] = place
 	}
 	slog.Info("Before sorted", "data", data, "len", len([]rune(text)))
@@ -113,9 +125,9 @@ func (f *Frequency) Analyse(text string, isRus bool) FreqData {
 	data.Sorted = make([]SymbolFreq, 0, len(data.Frequencies))
 
 	for k, v := range data.Frequencies {
-		v.part = v.part / float64(len([]rune(text)))
+		v.Part = v.Part / float64(len([]rune(text)))
 		data.Frequencies[k] = v
-		data.Sorted = append(data.Sorted, SymbolFreq{k, data.Frequencies[k].part, data.Frequencies[k].number})
+		data.Sorted = append(data.Sorted, SymbolFreq{k, data.Frequencies[k].Part, data.Frequencies[k].Number})
 	}
 
 	slices.SortFunc(data.Sorted, func(a, b SymbolFreq) int {
@@ -130,7 +142,7 @@ func (f *Frequency) Analyse(text string, isRus bool) FreqData {
 
 	for i := range data.Sorted {
 		data.Sorted[i].Place = i
-		data.Frequencies[data.Sorted[i].Symbol] = Place{data.Frequencies[data.Sorted[i].Symbol].part, i}
+		data.Frequencies[data.Sorted[i].Symbol] = Place{data.Frequencies[data.Sorted[i].Symbol].Part, i}
 		inStupid = append(inStupid, []rune(data.Sorted[i].Symbol)[0])
 	}
 	data.InStupid = string(inStupid)
@@ -147,16 +159,16 @@ func (f *Frequency) Decrypt(text string) string {
 		if runed[i] == ' ' {
 			continue
 		}
-		runed[i] = rusFreq[f.currentData.Frequencies[string(runed[i])].number]
+		runed[i] = rusFreq[f.currentData.Frequencies[string(runed[i])].Number]
 	}
 
 	return string(runed)
 }
 
-func (i *Index) Analyse(data FreqData) float64 {
+func Analyse(data FreqData) float64 {
 	ind := 0.0
 	for i := range data.Frequencies {
-		ind += data.Frequencies[i].part * data.Frequencies[i].part
+		ind += data.Frequencies[i].Part * data.Frequencies[i].Part
 	}
 	return ind
 }
@@ -178,9 +190,14 @@ func (a *AutoCorrelation) Analyse(text string) ACData {
 	}
 
 	for i, v := range data.Correlations {
+		if len(runed) == i+1 {
+			break
+		}
 		data.Correlations[i].Coefficient = float64(v.Amount) / float64(len(runed)-(i+1))
 		data.Correlations[i].T = i + 1
 	}
+
+	slog.Info("AutoCorrelation", "data", data.Correlations)
 
 	return data
 }
@@ -198,23 +215,53 @@ func (k *Kasiski) Analyse(text string) KasiskiData {
 				substrings[substring] = j
 			} else {
 				gs = append(gs, j-ind)
+				substrings[substring] = j
 			}
 		}
 	}
 
 	var data KasiskiData
-	data.PossibleDividers = make(map[int]struct{})
+	possibleDivs := make(map[int]int)
 	for _, v := range gs {
 		dividers := getDividers(v)
 		for j := range dividers {
-			data.PossibleDividers[dividers[j]] = struct{}{}
+			if dividers[j] != 1 {
+				possibleDivs[dividers[j]] += 1
+
+			}
 		}
+	}
+
+	keys := slices.Collect(maps.Keys(possibleDivs))
+	slices.SortFunc(keys, func(key1, key2 int) int {
+		switch {
+		case possibleDivs[key1] < possibleDivs[key2]:
+			return 1
+		case possibleDivs[key1] == possibleDivs[key2]:
+			if key1 > key2 {
+				return 1
+			}
+			return -1
+		default:
+			return -1
+		}
+	})
+
+	fmt.Println(keys)
+	data.PossibleDividers = make(map[int]struct{})
+	for i, v := range keys {
+		if i <= 4 {
+			data.PossibleDividers[v] = struct{}{}
+		} else {
+			break
+		}
+
 	}
 
 	return data
 }
 
-var ForTS = regexp.MustCompile(`[^\p{Latin}\p{Cyrillic}]`)
+var ForTS = regexp.MustCompile(`[^\p{Latin}\p{Cyrillic};.:,']`)
 
 func Beautify(text string) string {
 	text = strings.ToUpper(text)

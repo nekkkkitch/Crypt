@@ -3,10 +3,28 @@
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>13</title>
+
+    <title>13-14</title>
 </head>
 <body>
-<div id="app"></div>
+<div id="app">
+    <input id="input-text" name="input-text"></input> 
+    <button onclick="setText()">set text</button>
+    <br></br>
+    <input type="radio" id="language" name="language" value="russian">Russian</input>
+    <input type="radio" id="language" name="language" value="english" checked>English</input>
+    <br></br>
+    <button onclick="setFile()">select file</button>
+    <br></br>
+    <button onclick="analyse()">analyse text</button>
+    <br></br>
+    <div id="container_fr" style="width:100%; height:400px;"></div>
+    <label id="coincidence">Coincidence probability = </label>
+
+    <div id="container_ac" style="width:100%; height:400px;"></div>
+    <br></br>
+    <label id="key-lengths">Possible key values = </label>
+</div>
 <script src="./src/main.js" type="module"></script>
 </body>
 </html>

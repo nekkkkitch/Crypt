@@ -1,14 +1,17 @@
 package app
 
 import (
-	crypanalysis "13/backend/services/cryptanalysis"
+	"13/backend/services/cryptanalysis"
 	"context"
-	"encoding/json"
 	"log/slog"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type CryptAnalysator interface {
-	Analyse() crypanalysis.Data
+	Analyse() cryptanalysis.Data
+	SetText(text string, isRus bool)
+	SetFile(filePath string, isRus bool)
 }
 
 // App struct
@@ -30,11 +33,29 @@ func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Analyse() []byte {
+func (a *App) Analyse() cryptanalysis.Data {
 	data := a.a.Analyse()
-	toRet, err := json.Marshal(data)
-	if err != nil {
-		slog.Error("json err", "err", err)
+	return data
+}
+
+func (a *App) SetText(text string, language string) {
+	isRus := false
+	if language == "russian" {
+		isRus = true
 	}
-	return toRet
+	a.a.SetText(text, isRus)
+}
+
+func (a *App) SetFile(language string) {
+	filePath, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{DefaultDirectory: ".", Title: "Select file"})
+	if err != nil {
+		slog.Error("SetFile", "err", err)
+		return
+	}
+	slog.Info("setfile", "file", filePath)
+	isRus := false
+	if language == "russian" {
+		isRus = true
+	}
+	a.a.SetFile(filePath, isRus)
 }

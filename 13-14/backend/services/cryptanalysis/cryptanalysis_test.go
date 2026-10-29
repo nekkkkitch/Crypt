@@ -1,4 +1,4 @@
-package crypanalysis
+package cryptanalysis
 
 import (
 	"fmt"
@@ -23,8 +23,6 @@ AVYXL`
 	fmt.Println()
 	try := a.Freq.Decrypt(text)
 	slog.Info("Try", "try", try)
-	ind := a.Index.Analyse(data)
-	slog.Info("Data", "ind", ind)
 	ac := a.AC.Analyse(text)
 	slog.Info("ACData", "ac", ac)
 	ka := a.Kasiski.Analyse(text)
